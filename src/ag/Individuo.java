@@ -5,15 +5,14 @@ import java.util.Random;
 public class Individuo implements Comparable<Individuo> {
 	
 	private int[] individuo = new int[10];
-	private long aptidao;
-	private long casasRoleta;
+	private double aptidao;
 	
 	@Override
 	public int compareTo(Individuo individuo) {
-		if(this.aptidao > individuo.getAptidao()) {
+		if(this.aptidao < individuo.getAptidao()) {
 			return -1;
 		}
-		if(this.aptidao < individuo.getAptidao()) {
+		if(this.aptidao > individuo.getAptidao()) {
 			return 1;
 		}
 		return 0;
@@ -22,25 +21,14 @@ public class Individuo implements Comparable<Individuo> {
 	public int[] getIndividuo() {
 		return individuo;
 	}
-	
 	public void setIndividuo(int[] individuo) {
 		this.individuo = individuo;
 	}
-	
-	public long getAptidao() {
+	public double getAptidao() {
 		return aptidao;
 	}
-	
-	public void setAptidao(long aptidao) {
+	public void setAptidao(double aptidao) {
 		this.aptidao = aptidao;
-	}
-	
-	public long getCasasRoleta() {
-		return casasRoleta;
-	}
-
-	public void setCasasRoleta(long casasRoleta) {
-		this.casasRoleta = casasRoleta;
 	}
 	
 	public void geraIndividuo() {
@@ -72,14 +60,14 @@ public class Individuo implements Comparable<Individuo> {
 		this.individuo = aux;
 	}
 	
-	public void avaliaIndividuo100000() {
+	public void avaliaIndividuo() {
 		double send, more, money;
 		
 		send = 1000 * (double)this.individuo[0] + 100 * (double)this.individuo[1] + 10 * (double)this.individuo[2] + (double)this.individuo[3];
 		more = 1000 * (double)this.individuo[4] + 100 * (double)this.individuo[5] + 10 * (double)this.individuo[6] + (double)this.individuo[1];
 		money = 10000 * (double)this.individuo[4] + 1000 * (double)this.individuo[5] + 100 * (double)this.individuo[2] + 10 * (double)this.individuo[1] + (double)this.individuo[7];
 	
-		this.aptidao = (long) (100000 - Math.abs((send + more) - money));
+		this.aptidao = Math.abs((send + more) - money);
 	}
 	
 	public void avaliaIndividuoCoca() {
@@ -89,6 +77,6 @@ public class Individuo implements Comparable<Individuo> {
 		cola = 1000 * (double)this.individuo[0] + 100 * (double)this.individuo[1] + 10 * (double)this.individuo[3] + (double)this.individuo[2];
 		soda = 1000 * (double)this.individuo[4] + 100 * (double)this.individuo[1] + 10 * (double)this.individuo[5] + (double)this.individuo[2];
 		
-		this.aptidao = (long) Math.abs((coca+cola)-soda);
+		this.aptidao = Math.abs((coca+cola)-soda);
 	}
 }

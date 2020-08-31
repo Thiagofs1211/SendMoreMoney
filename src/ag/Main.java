@@ -9,22 +9,17 @@ public class Main {
 
 	public static void main(String[] args) {
 		
-		/*
-		 * Tipo de seleção:
-		 * 
-		 * 0 - Roleta
-		 * 1 - Torneio 2
-		 * 2 - Torneio 3
-		 */
-		
 		int tamanhoPopulacao = 100;
-		int numeroFilhos = 80;
-		int geracoes = 50;
-		int execucoes = 1000;
-		int taxaMutacao = 2;
-		int tipoSelecao = 0;
+		int numeroFilhos = 60;
+		int geracoes = 100;
+		int execucoes = 100;
 		
 		int acertos = 0;
+		int acertos100 = 0;
+		int acertos500 = 0;
+		int acertosC = 0;
+		int acertosC100 = 0;
+		int acertosC500 = 0;
 		
 		for(int k = 0; k < execucoes; k++) {
 			
@@ -34,28 +29,87 @@ public class Main {
 			for(int i = 0; i < tamanhoPopulacao; i++) {
 				Individuo aux = new Individuo();
 				aux.geraIndividuo();
-				aux.avaliaIndividuo100000();
+				aux.avaliaIndividuo();
 				populacao.add(aux);
 			}
 			
-			mostraPopulacao(populacao);
+			//mostraPopulacao(populacao);
 			
 			//Executa o AG o numero de gerações
 			for(int i = 0; i < geracoes; i++) {
-				AG(populacao,tamanhoPopulacao,numeroFilhos,taxaMutacao, tipoSelecao);
+				AG(populacao,tamanhoPopulacao,numeroFilhos,0);
 			}
 			
-			mostraPopulacao(populacao);
-			System.out.print("Execução "+k);
-			mostraMelhorIndividuo(populacao);
+			//mostraPopulacao(populacao);
+			//System.out.print("Execução "+k);
+			//mostraMelhorIndividuo(populacao);
 			
-			if(verificaSolucaoOtima(populacao.get(0))) {
+			if(populacao.get(0).getAptidao() == 0) {
 				acertos++;
+			}
+			
+			if(populacao.get(0).getAptidao() <= 100) {
+				acertos100++;
+			}
+			
+			if(populacao.get(0).getAptidao() <= 500) {
+				acertos500++;
+			}
+		}
+		
+		for(int k = 0; k < execucoes; k++) {
+			
+			List<Individuo> populacao = new ArrayList<Individuo>();
+		
+			//Cria e avalia a populacao Inicial
+			for(int i = 0; i < tamanhoPopulacao; i++) {
+				Individuo aux = new Individuo();
+				aux.geraIndividuo();
+				aux.avaliaIndividuoCoca();
+				populacao.add(aux);
+			}
+			
+			//mostraPopulacao(populacao);
+			
+			//Executa o AG o numero de gerações
+			for(int i = 0; i < geracoes; i++) {
+				AG(populacao,tamanhoPopulacao,numeroFilhos,1);
+			}
+			
+			//mostraPopulacao(populacao);
+			//System.out.print("Execução "+k);
+			//mostraMelhorIndividuo(populacao);
+			
+			if(populacao.get(0).getAptidao() == 0) {
+				acertosC++;
+			}
+			
+			if(populacao.get(0).getAptidao() <= 100) {
+				acertosC100++;
+			}
+			
+			if(populacao.get(0).getAptidao() <= 500) {
+				acertosC500++;
 			}
 		}
 		
 		System.out.println("\nNúmero total de acertos SEND+MORE (resultado ótimo): "+acertos);
-		System.out.println("Porcentagem de acerto: "+acertos/10+"%");
+		System.out.println("Porcentagem de acerto: "+acertos+"%");
+		
+		System.out.println("\nNúmero total de acertos SEND+MORE (resultado com aptidão <= 100): "+acertos100);
+		System.out.println("Porcentagem de acerto: "+acertos100+"%");
+		
+		System.out.println("\nNúmero total de acertos SEND+MORE (resultado com aptidão <= 500): "+acertos500);
+		System.out.println("Porcentagem de acerto SEND+MORE: "+acertos500+"%");
+		
+		System.out.println("\nNúmero total de acertos COCA+COLA (resultado ótimo): "+acertosC);
+		System.out.println("Porcentagem de acerto COCA+COLA: "+acertosC+"%");
+		
+		System.out.println("\nNúmero total de acertos (resultado com aptidão <= 100): "+acertosC100);
+		System.out.println("Porcentagem de acerto: "+acertosC100+"%");
+		
+		System.out.println("\nNúmero total de acertos COCA+COLA (resultado com aptidão <= 500): "+acertosC500);
+		System.out.println("Porcentagem de acerto COCA+COLA: "+acertosC500+"%");
 
 	}
 	
@@ -68,39 +122,25 @@ public class Main {
 		}
 	}
 	
-	public static void AG(List<Individuo> populacao, int tamanhoPopulacao, int numeroFilhos, int taxaMutacao, int tipoSelecao) {
-		int pai1 = 0, pai2 = 0;
+	public static void AG(List<Individuo> populacao, int tamanhoPopulacao, int numeroFilhos, int cocaOrMoney) {
+		int pai1, pai2;
 		Random random = new Random();
-		//List<Integer> pais = new ArrayList<Integer>();
+		List<Integer> pais = new ArrayList<Integer>();
 		
-		//mostraPopulacao(populacao);
-		
-		//Criação dos Filhos
 		for(int i = 0; i < numeroFilhos/2; i++) {
+			pai1 = torneio2(populacao, tamanhoPopulacao);
+			pai2 = torneio2(populacao, tamanhoPopulacao);
 			
-			//Método da Roleta
-			if(tipoSelecao == 0) {
-				int numeroMaximoRoleta = montarRoleta(populacao);
-				pai1 = roleta(populacao, numeroMaximoRoleta);
-				pai2 = roleta(populacao, numeroMaximoRoleta);
-			} else if(tipoSelecao == 1) { //Método do torneio de tour 2
+			//Regra para não selecionar os mesmos pais
+			while(pais.contains(pai1)) {
 				pai1 = torneio2(populacao, tamanhoPopulacao);
-				pai2 = torneio2(populacao, tamanhoPopulacao);
-				
-				/*//Regra para não selecionar os mesmos pais
-				while(pais.contains(pai1)) {
-					pai1 = torneio2(populacao, tamanhoPopulacao);
-				}
-				pais.add(pai1);
-				
-				while(pais.contains(pai2)) {
-					pai2 = torneio2(populacao, tamanhoPopulacao);
-				}
-				pais.add(pai2);*/
-			} else if(tipoSelecao == 2) { // Método do torneio de tour 3
-				pai1 = torneio3(populacao, tamanhoPopulacao);
-				pai2 = torneio3(populacao, tamanhoPopulacao);
 			}
+			pais.add(pai1);
+			
+			while(pais.contains(pai2)) {
+				pai2 = torneio2(populacao, tamanhoPopulacao);
+			}
+			pais.add(pai2);
 			
 			Individuo filho1 = new Individuo();
 			Individuo filho2 = new Individuo();
@@ -108,7 +148,7 @@ public class Main {
 			filho1 = populacao.get(pai1);
 			filho2 = populacao.get(pai2);
 			
-			//Cruzamento utilizando método ciclico
+			//Cruzamento
 			int numero = random.nextInt(10);
 			int primeiro = filho1.getIndividuo()[numero];
 			while(primeiro != filho2.getIndividuo()[numero]) {
@@ -131,17 +171,23 @@ public class Main {
 			
 			//Mutacao
 			int chance = random.nextInt(100);
-			if(chance < taxaMutacao) {
+			if(chance < 3) { //3% de chance de mutação filho 1
 				mutacao(filho1);
 			}
 			chance = random.nextInt(100);
-			if(chance < taxaMutacao) {
+			if(chance < 3) { //3% de chance de mutação filho 2
 				mutacao(filho2);
 			}
 			
-			filho1.avaliaIndividuo100000();
-			filho2.avaliaIndividuo100000();
+			if(cocaOrMoney == 0) {
+				filho1.avaliaIndividuo();
+				filho2.avaliaIndividuo();
+			}
 			
+			if(cocaOrMoney == 1) {
+				filho1.avaliaIndividuoCoca();
+				filho2.avaliaIndividuoCoca();
+			}
 			
 			populacao.add(filho1);
 			populacao.add(filho2);
@@ -155,52 +201,12 @@ public class Main {
 		int ind1 = random.nextInt(tamanhoPopulacao);
 		int ind2 = random.nextInt(tamanhoPopulacao);
 		
-		if(populacao.get(ind1).getAptidao() > populacao.get(ind2).getAptidao()) {
+		if(populacao.get(ind1).getAptidao() < populacao.get(ind2).getAptidao()) {
 			return ind1;
 		} else {
 			return ind2;
 		}
 	}
-	
-	public static int torneio3(List<Individuo> populacao, int tamanhoPopulacao) {
-		Random random = new Random();
-		int ind1 = random.nextInt(tamanhoPopulacao);
-		int ind2 = random.nextInt(tamanhoPopulacao);
-		int ind3 = random.nextInt(tamanhoPopulacao);
-		
-		if(populacao.get(ind1).getAptidao() > populacao.get(ind2).getAptidao() && populacao.get(ind1).getAptidao() > populacao.get(ind3).getAptidao()) {
-			return ind1;
-		} else if(populacao.get(ind2).getAptidao() > populacao.get(ind1).getAptidao() && populacao.get(ind2).getAptidao() > populacao.get(ind3).getAptidao()) {
-			return ind2;
-		} else {
-			return ind3;
-		}
-	}
-	
-	//Monta a roleta e retorna a ultima casa da roleta
-	public static int montarRoleta(List<Individuo> populacao) {
-		int casaRoleta = 0;
-		for(Individuo pop: populacao) {
-			casaRoleta += pop.getAptidao();
-			pop.setCasasRoleta(casaRoleta);
-		}
-		return casaRoleta;
-	}
-	
-	//Executa a roleta para selecionar um pai
-	public static int roleta(List<Individuo> populacao, int casaRoleta) {
-		Random random = new Random();
-		int sorteio = random.nextInt(casaRoleta);
-		int i = 0;
-		for(Individuo pop : populacao) {
-			i++;
-			if(pop.getCasasRoleta() > sorteio) {
-				break;
-			}
-		}
-		return i-1;
-	}
-	
 	
 	public static void mutacao(Individuo ind) {
 		Random random = new Random();
@@ -219,10 +225,9 @@ public class Main {
 		Collections.sort(populacao);
 		
 		//removendo o excesso de população
-		for(int i = tamanhoPopulacao+numeroFilhos-1; i > tamanhoPopulacao; i--) {
-			populacao.remove(i);
+		for(int i = tamanhoPopulacao; i < tamanhoPopulacao+numeroFilhos; i++) {
+			populacao.remove(tamanhoPopulacao);
 		}
-		populacao.remove(tamanhoPopulacao);
 	}
 	
 	public static void mostraMelhorIndividuo(List<Individuo> populacao) {
@@ -231,18 +236,6 @@ public class Main {
 			System.out.print(populacao.get(0).getIndividuo()[i] + " ");
 		}
 		System.out.println("Aptidao: "+populacao.get(0).getAptidao());
-	}
-	
-	public static boolean verificaSolucaoOtima(Individuo individuo) {
-		int send = 1000 * individuo.getIndividuo()[0] + 100 * individuo.getIndividuo()[1] + 10 * individuo.getIndividuo()[2] + individuo.getIndividuo()[3];
-		int more = 1000 * individuo.getIndividuo()[4] + 100 * individuo.getIndividuo()[5] + 10 * individuo.getIndividuo()[6] + individuo.getIndividuo()[1];
-		int money = 10000 * individuo.getIndividuo()[4] + 1000 * individuo.getIndividuo()[5] + 100 * individuo.getIndividuo()[2] + 10 * individuo.getIndividuo()[1] + individuo.getIndividuo()[7];
-		
-		if(send + more - money == 0) {
-			return true;
-		} else {
-			return false;
-		}
 	}
 
 }
