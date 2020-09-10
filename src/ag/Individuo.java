@@ -5,14 +5,16 @@ import java.util.Random;
 public class Individuo implements Comparable<Individuo> {
 	
 	private int[] individuo = new int[10];
-	private double aptidao;
+	private long aptidao;
+	private long casasRoleta;
+	private long casaRoletaRankingLinear;
 	
 	@Override
 	public int compareTo(Individuo individuo) {
-		if(this.aptidao < individuo.getAptidao()) {
+		if(this.aptidao > individuo.getAptidao()) {
 			return -1;
 		}
-		if(this.aptidao > individuo.getAptidao()) {
+		if(this.aptidao < individuo.getAptidao()) {
 			return 1;
 		}
 		return 0;
@@ -21,14 +23,25 @@ public class Individuo implements Comparable<Individuo> {
 	public int[] getIndividuo() {
 		return individuo;
 	}
+	
 	public void setIndividuo(int[] individuo) {
 		this.individuo = individuo;
 	}
-	public double getAptidao() {
+	
+	public long getAptidao() {
 		return aptidao;
 	}
-	public void setAptidao(double aptidao) {
+	
+	public void setAptidao(long aptidao) {
 		this.aptidao = aptidao;
+	}
+	
+	public long getCasasRoleta() {
+		return casasRoleta;
+	}
+
+	public void setCasasRoleta(long casasRoleta) {
+		this.casasRoleta = casasRoleta;
 	}
 	
 	public void geraIndividuo() {
@@ -60,14 +73,28 @@ public class Individuo implements Comparable<Individuo> {
 		this.individuo = aux;
 	}
 	
-	public void avaliaIndividuo() {
+	public void avaliaIndividuo100000() {
 		double send, more, money;
 		
 		send = 1000 * (double)this.individuo[0] + 100 * (double)this.individuo[1] + 10 * (double)this.individuo[2] + (double)this.individuo[3];
 		more = 1000 * (double)this.individuo[4] + 100 * (double)this.individuo[5] + 10 * (double)this.individuo[6] + (double)this.individuo[1];
 		money = 10000 * (double)this.individuo[4] + 1000 * (double)this.individuo[5] + 100 * (double)this.individuo[2] + 10 * (double)this.individuo[1] + (double)this.individuo[7];
 	
-		this.aptidao = Math.abs((send + more) - money);
+		this.aptidao = (long) (100000 - Math.abs((send + more) - money));
+	}
+	
+	public void avaliaIndividuoPiorIndividuo(Individuo piorIndividuo) {
+		double send, more, money;
+		
+		send = 1000 * (double)this.individuo[0] + 100 * (double)this.individuo[1] + 10 * (double)this.individuo[2] + (double)this.individuo[3];
+		more = 1000 * (double)this.individuo[4] + 100 * (double)this.individuo[5] + 10 * (double)this.individuo[6] + (double)this.individuo[1];
+		money = 10000 * (double)this.individuo[4] + 1000 * (double)this.individuo[5] + 100 * (double)this.individuo[2] + 10 * (double)this.individuo[1] + (double)this.individuo[7];
+		
+		double sendPior = 1000 * (double)piorIndividuo.getIndividuo()[0] + 100 * (double)piorIndividuo.getIndividuo()[1] + 10 * (double)piorIndividuo.getIndividuo()[2] + (double)piorIndividuo.getIndividuo()[3];
+		double morePior = 1000 * (double)piorIndividuo.getIndividuo()[4] + 100 * (double)piorIndividuo.getIndividuo()[5] + 10 * (double)piorIndividuo.getIndividuo()[6] + (double)piorIndividuo.getIndividuo()[1];
+		double moneyPior = 10000 * (double)piorIndividuo.getIndividuo()[4] + 1000 * (double)piorIndividuo.getIndividuo()[5] + 100 * (double)piorIndividuo.getIndividuo()[2] + 10 * (double)piorIndividuo.getIndividuo()[1] + (double)piorIndividuo.getIndividuo()[7];
+	
+		this.aptidao = (long) (Math.abs((sendPior + morePior) - moneyPior) + 1 - Math.abs((send + more) - money));
 	}
 	
 	public void avaliaIndividuoCoca() {
@@ -77,6 +104,14 @@ public class Individuo implements Comparable<Individuo> {
 		cola = 1000 * (double)this.individuo[0] + 100 * (double)this.individuo[1] + 10 * (double)this.individuo[3] + (double)this.individuo[2];
 		soda = 1000 * (double)this.individuo[4] + 100 * (double)this.individuo[1] + 10 * (double)this.individuo[5] + (double)this.individuo[2];
 		
-		this.aptidao = Math.abs((coca+cola)-soda);
+		this.aptidao = (long) Math.abs((coca+cola)-soda);
+	}
+
+	public long getCasaRoletaRankingLinear() {
+		return casaRoletaRankingLinear;
+	}
+
+	public void setCasaRoletaRankingLinear(long casaRoletaRankingLinear) {
+		this.casaRoletaRankingLinear = casaRoletaRankingLinear;
 	}
 }
